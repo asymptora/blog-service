@@ -1,0 +1,17 @@
+# Local agent configuration, never versioned
+AGENTS.md
+
+# Secrets: only the SOPS-encrypted form is ever tracked
+.env
+.env.*.local
+!.env.example
+
+# OS and editor noise
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Local-only artifacts from testing backup or restore
+*.sql
+*.sql.gz
