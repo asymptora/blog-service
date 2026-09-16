@@ -15,3 +15,4 @@ AGENTS.md
 # Local-only artifacts from testing backup or restore
 *.sql
 *.sql.gz
+.claude/
