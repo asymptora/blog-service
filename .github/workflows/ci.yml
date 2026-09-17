@@ -51,3 +51,18 @@ jobs:
 
       - name: Lint workflow files
         run: yamllint .github/workflows
+
+  compose-config:
+    name: docker compose config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Confirm Docker Compose is available
+        run: docker compose version
+
+      - name: Validate compose config
+        run: |
+          cp .env.example .env
+          docker compose config
+          rm .env
