@@ -115,12 +115,12 @@ not a side effect of a routine `docker compose pull`.
 ### Networking and domains
 
 The public site is served at `blog.asymptora.com`. Ghost Admin is served at
-a nested subdomain, `admin.blog.asymptora.com`, kept separate from the
-public site per Ghost's own guidance on privilege-escalation surface when
-admin and front-end share a domain. Both routes go through the Cloudflare
-Tunnel already operated by `asymptora/infra`; the new public routes are
-requested there via pull request, per that repository's ownership of tunnel
-routes.
+`blog-admin.asymptora.com`, kept separate from the public site per Ghost's
+own guidance on privilege-escalation surface when admin and front-end share
+a domain. See the addendum below on why this is a flat subdomain rather
+than a nested one. Both routes go through the Cloudflare Tunnel already
+operated by `asymptora/infra`; the new public routes are requested there
+via pull request, per that repository's ownership of tunnel routes.
 
 Caddy, included in the official Compose stack, handles Host-based routing
 between the two domains and speaks plain HTTP internally. TLS terminates at
@@ -240,7 +240,37 @@ planning of this RFC has a decision recorded above.
   of scope (see Non-Goals). Any future interest in one of these requires a
   new RFC, evaluated against the LXC's resource budget at that time.
 
+## Addendum (2026-09-17): Admin domain flattened
+
+The "Networking and domains" section above originally specified a nested
+admin subdomain, `admin.blog.asymptora.com`. Discovered during the Ingress
+and admin domain milestone: Cloudflare's free Universal SSL certificate
+covers the root domain and exactly one level of subdomain, not two.
+`blog.asymptora.com` (one level) was covered automatically; the nested
+admin domain (two levels) was not, and failed TLS handshake at the edge
+when the route was added.
+
+The two ways to keep the nested form both cost money with no functional
+benefit for this deployment: Cloudflare's Total TLS requires the paid
+Advanced Certificate Manager add-on, billed per domain per month. Given
+this project's consistent preference for avoiding recurring cost where a
+free option is equivalent (the outbound tunnel instead of port forwarding,
+the existing Zoho mailbox instead of a new email provider), the admin
+domain was flattened instead: `blog-admin.asymptora.com`, one level,
+covered by the free certificate that was already working for the public
+site.
+
+This also changes the naming pattern originally suggested for future
+services (`api-x.asymptora.com` / `admin.api-x.asymptora.com`). Any new
+service's admin subdomain should default to the flat form
+(`api-x-admin.asymptora.com`) unless a future RFC deliberately budgets for
+Advanced Certificate Manager.
+
+No other decision in this RFC changes as a result.
+
 ## References
 
 - Ghost documentation: https://docs.ghost.org
 - Ghost Docker Compose tooling: https://github.com/TryGhost/ghost-docker
+- Cloudflare Universal SSL certificate coverage: https://developers.cloudflare.com/ssl/edge-certificates/universal-ssl/
+- Cloudflare Total TLS (requires Advanced Certificate Manager): https://developers.cloudflare.com/ssl/edge-certificates/additional-options/total-tls/
