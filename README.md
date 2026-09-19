@@ -1,6 +1,7 @@
 # blog-service
 
 [![CI](https://github.com/asymptora/blog-service/actions/workflows/ci.yml/badge.svg)](https://github.com/asymptora/blog-service/actions/workflows/ci.yml)
+[![Status](https://img.shields.io/badge/status-production-brightgreen)](https://blog.asymptora.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This repository holds the Ghost application stack that runs the Asymptora
