@@ -14,8 +14,16 @@ mkdir -p "$DUMP_DIR"
 
 notify_failure() {
   local message="$1"
-  # Best-effort: a failed notification must never mask the real failure,
-  # so its own exit code is discarded.
+  # Guarded explicitly rather than relying on `|| true` alone: under
+  # set -u, an unset NTFY_TOPIC would abort the script on variable
+  # expansion, before curl ever runs, silently skipping the one thing
+  # this function exists to do. A logged skip beats a silent crash.
+  if [[ -z "${NTFY_TOPIC:-}" ]]; then
+    echo "NTFY_TOPIC is not set, cannot send failure notification: $message" >&2
+    return 0
+  fi
+  # Best-effort beyond this point: a failed notification must never mask
+  # the real failure, so curl's own exit code is discarded.
   curl -fsS \
     -H "Title: Ghost DB backup failed" \
     -H "Priority: high" \
